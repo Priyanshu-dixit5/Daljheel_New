@@ -61,6 +61,14 @@ export default function Product() {
   const images = product.images || [];
   const image = images[activeImage] || images[0];
   const wished = isWishlisted(product.slug);
+  const whatsappMessage = [
+    'Hello Daljheel Food Mart, I want to order:',
+    `Product: ${product.name}`,
+    `Quantity: ${qty}`,
+    `Price: ₹${product.price}`,
+    product.size ? `Variant/Size: ${product.size}` : '',
+    product.description ? `Details: ${product.description}` : '',
+  ].filter(Boolean).join('\n');
 
   return (
     <section className="bg-cream-light py-8 lg:py-16">
@@ -136,9 +144,7 @@ export default function Product() {
 
           {content?.whatsappDigits && (
             <a
-              href={`https://wa.me/${content.whatsappDigits}?text=${encodeURIComponent(
-                `Hello Daljheel Food Mart,\n\nI would like to ask about ${product.name}.`
-              )}`}
+              href={`https://wa.me/${content.whatsappDigits}?text=${encodeURIComponent(whatsappMessage)}`}
               target="_blank"
               rel="noopener noreferrer"
               className="btn-outline mt-4"

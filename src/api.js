@@ -195,6 +195,22 @@ export function adminDashboard() {
   return request('/admin/dashboard', { auth: true });
 }
 
+export function adminProducts() {
+  return request('/admin/products', { auth: true });
+}
+
+export function adminCreateProduct(payload) {
+  return request('/admin/products', { method: 'POST', body: payload, auth: true });
+}
+
+export function adminUpdateProduct(slug, payload) {
+  return request(`/admin/products/${encodeURIComponent(slug)}`, { method: 'PUT', body: payload, auth: true });
+}
+
+export function adminDeleteProduct(slug) {
+  return request(`/admin/products/${encodeURIComponent(slug)}`, { method: 'DELETE', auth: true });
+}
+
 export function adminOrders({ q, status } = {}) {
   const params = new URLSearchParams();
   if (q) params.set('q', q);

@@ -15,11 +15,6 @@ const PAYMENT_OPTIONS = [
     title: 'Cash on delivery',
     desc: 'Pay when your order arrives. Confirmed via WhatsApp.',
   },
-  {
-    id: 'upi',
-    title: 'UPI',
-    desc: 'Share UPI details on WhatsApp after placing the order.',
-  },
 ];
 
 export default function Checkout() {

@@ -26,7 +26,7 @@ const ORDER_STATUSES = [
   'Cancelled',
 ];
 
-const products = [
+const seedProducts = [
   ['kashmiri-saffron', 'Kashmiri Saffron', 'saffron', 799, 999, '1 g', '/images/saffron.png', 'Handpicked Kashmiri kesar with a rich aroma and deep natural colour.'],
   ['pure-shilajit', 'Pure Himalayan Shilajit', 'shilajit', 1199, 1499, '20 g', '/images/shilajit.png', 'Purified Himalayan shilajit resin for your everyday wellness routine.'],
   ['premium-walnuts', 'Premium Kashmiri Walnuts', 'dry-fruits', 499, 599, '500 g', '/images/walnuts.png', 'Naturally crunchy, premium walnut kernels from Kashmir.'],
@@ -77,6 +77,7 @@ const defaults = () => ({
   wishlists: {},
   addresses: {},
   orders: [],
+  products: seedProducts,
 });
 
 function hash(value) {
@@ -95,6 +96,10 @@ function load() {
 }
 
 let db = load();
+if (!Array.isArray(db.products)) {
+  db.products = seedProducts;
+  save();
+}
 
 function save(value = db) {
   mkdirSync(dataDir, { recursive: true });
@@ -149,7 +154,41 @@ function auth(req, admin = false) {
 }
 
 function findProduct(slug) {
-  return products.find((p) => p.slug === slug);
+  return db.products.find((p) => p.slug === slug);
+}
+
+function productPayload(input, current = {}) {
+  const name = String(input.name ?? current.name ?? '').trim();
+  const slug = String(input.slug ?? current.slug ?? '')
+    .trim()
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-|-$/g, '');
+  const price = Number(input.price ?? current.price ?? 0);
+  const mrp = Number(input.mrp ?? current.mrp ?? price);
+  if (!name || !slug || !Number.isFinite(price) || price < 0 || !Number.isFinite(mrp) || mrp < 0) {
+    throw new Error('Name, slug, price and MRP are required.');
+  }
+  const image = String(input.image ?? current.image ?? '/images/saffron.png').trim();
+  const images = Array.isArray(input.images) && input.images.length
+    ? input.images
+    : input.image !== undefined
+      ? [image]
+      : current.images || [image];
+  return {
+    ...current,
+    name,
+    slug,
+    category: String(input.category ?? current.category ?? 'dry-fruits').trim(),
+    price,
+    mrp,
+    discount: mrp > price ? Math.round((1 - price / mrp) * 100) : 0,
+    size: String(input.size ?? current.size ?? '').trim(),
+    image,
+    images: images.map(String),
+    description: String(input.description ?? current.description ?? '').trim(),
+    isAvailable: input.isAvailable ?? current.isAvailable ?? true,
+  };
 }
 
 function cartFor(userId) {
@@ -371,7 +410,7 @@ async function api(req, res, url) {
     return respond(
       res,
       200,
-      products.filter(
+      db.products.filter(
         (p) =>
           (!category || p.category === category) &&
           (!query || `${p.name} ${p.description}`.toLowerCase().includes(query))
@@ -708,6 +747,53 @@ function adminApi(req, res, url, path, method, parsed) {
         at: o.createdAt,
       })),
     });
+  }
+
+  if (method === 'GET' && path === '/admin/products') {
+    return respond(res, 200, { products: db.products });
+  }
+
+  if (method === 'POST' && path === '/admin/products') {
+    try {
+      const product = productPayload(parsed);
+      if (findProduct(product.slug)) return error(res, 409, 'A product with this slug already exists');
+      product.id = randomUUID();
+      db.products.push(product);
+      save();
+      return respond(res, 201, { product });
+    } catch (err) {
+      return error(res, 400, err.message);
+    }
+  }
+
+  if (method === 'PUT' && path.startsWith('/admin/products/')) {
+    const slug = decodeURIComponent(path.slice('/admin/products/'.length));
+    const product = findProduct(slug);
+    if (!product) return error(res, 404, 'Product not found');
+    try {
+      const updated = productPayload(parsed, product);
+      if (updated.slug !== slug && findProduct(updated.slug)) return error(res, 409, 'A product with this slug already exists');
+      Object.assign(product, updated);
+      save();
+      return respond(res, 200, { product });
+    } catch (err) {
+      return error(res, 400, err.message);
+    }
+  }
+
+  if (method === 'DELETE' && path.startsWith('/admin/products/')) {
+    const slug = decodeURIComponent(path.slice('/admin/products/'.length));
+    const index = db.products.findIndex((p) => p.slug === slug);
+    if (index < 0) return error(res, 404, 'Product not found');
+    const [product] = db.products.splice(index, 1);
+    Object.keys(db.carts).forEach((userId) => {
+      db.carts[userId] = (db.carts[userId] || []).filter((item) => item.slug !== slug);
+    });
+    Object.keys(db.wishlists).forEach((userId) => {
+      db.wishlists[userId] = (db.wishlists[userId] || []).filter((itemSlug) => itemSlug !== slug);
+    });
+    save();
+    return respond(res, 200, { product });
   }
 
   if (method === 'GET' && path === '/admin/orders') {

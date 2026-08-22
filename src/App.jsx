@@ -23,6 +23,7 @@ import Addresses from './pages/account/Addresses';
 import AdminLayout from './pages/admin/AdminLayout';
 import AdminLogin from './pages/admin/AdminLogin';
 import AdminDashboard from './pages/admin/AdminDashboard';
+import AdminProducts from './pages/admin/AdminProducts';
 import AdminUsers from './pages/admin/AdminUsers';
 import AdminAnalytics from './pages/admin/AdminAnalytics';
 import AdminSettings from './pages/admin/AdminSettings';
@@ -40,6 +41,7 @@ export default function App() {
         }
       >
         <Route index element={<AdminDashboard />} />
+        <Route path="products" element={<AdminProducts />} />
         <Route path="users" element={<AdminUsers />} />
         <Route path="users/:id" element={<AdminUsers />} />
         <Route path="analytics" element={<AdminAnalytics />} />
