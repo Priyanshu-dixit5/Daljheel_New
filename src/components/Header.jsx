@@ -1,5 +1,5 @@
-import { Link, NavLink, useNavigate } from 'react-router-dom';
-import { Search, ShoppingBag, Menu, X, User, Heart } from 'lucide-react';
+import { Link, NavLink } from 'react-router-dom';
+import { ShoppingBag, Menu, X, User, Heart } from 'lucide-react';
 import { useState } from 'react';
 import { useCart } from '../context/CartContext';
 import { useContent } from '../context/ContentContext';
@@ -18,16 +18,7 @@ export default function Header() {
   const { count: wishCount } = useWishlist();
   const { isAuthenticated, user } = useAuth();
   const content = useContent();
-  const navigate = useNavigate();
-  const [query, setQuery] = useState('');
   const [open, setOpen] = useState(false);
-
-  function onSearch(e) {
-    e.preventDefault();
-    const q = query.trim();
-    navigate(q ? `/shop?search=${encodeURIComponent(q)}` : '/shop');
-    setOpen(false);
-  }
 
   return (
     <header className="sticky top-0 z-50 border-b border-[#d8d0c2] bg-[#faf6ee]/95 backdrop-blur-sm">
@@ -36,7 +27,7 @@ export default function Header() {
           <img
             src="/images/logo.png"
             alt="Daljheel Food Mart"
-            className="h-9 w-9 shrink-0 rounded-full bg-black object-cover sm:h-11 sm:w-11"
+            className="h-10 w-10 shrink-0 rounded-full bg-black object-cover sm:h-12 sm:w-12"
           />
           <div className="min-w-0">
             <span className="font-display text-sm text-[#272c27] sm:text-lg">Daljheel </span>
@@ -59,17 +50,6 @@ export default function Header() {
         </nav>
 
         <div className="flex shrink-0 items-center gap-1.5 sm:gap-2">
-          <form onSubmit={onSearch} className="relative hidden xl:block">
-            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#77746d]" />
-            <input
-              type="search"
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
-              placeholder="Search the pantry"
-              className="w-52 border border-[#d8d0c2] bg-white py-2.5 pl-10 pr-4 text-sm outline-none transition focus:border-[#24513f] xl:w-56"
-            />
-          </form>
-
           {/* Wishlist — hidden on mobile (accessible via bottom nav) */}
           <Link
             to="/account/wishlist"
@@ -123,15 +103,6 @@ export default function Header() {
 
       {open && (
         <div className="border-t border-[#d8d0c2] bg-[#faf6ee] px-4 py-4 lg:hidden">
-          <form onSubmit={onSearch} className="mb-4">
-            <input
-              type="search"
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
-              placeholder="Search saffron, dry fruits & more"
-              className="w-full border border-[#d8d0c2] bg-white px-3 py-3 text-sm outline-none"
-            />
-          </form>
           <div className="flex flex-col gap-3">
             {navLinks.map((link) => (
               <Link key={link.label} to={link.to} onClick={() => setOpen(false)} className="text-sm text-ink">

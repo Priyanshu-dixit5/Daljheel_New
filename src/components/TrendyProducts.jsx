@@ -41,7 +41,7 @@ export function ProductCard({ product }) {
           type="button"
           onClick={onWish}
           aria-label="Toggle wishlist"
-          className="absolute right-2.5 top-2.5 rounded-full bg-white/90 p-1.5 text-ink shadow-sm transition hover:text-gold"
+          className="absolute right-2.5 top-2.5 cursor-pointer rounded-full bg-white/90 p-1.5 text-ink shadow-sm transition duration-200 hover:scale-110 hover:bg-[#24513f] hover:text-white focus-visible:scale-110 focus-visible:bg-[#24513f] focus-visible:text-white focus-visible:outline-none"
         >
           <Heart className={`h-3.5 w-3.5 ${wished ? 'fill-gold text-gold' : ''}`} />
         </button>

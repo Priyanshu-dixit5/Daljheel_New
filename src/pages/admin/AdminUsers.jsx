@@ -253,7 +253,7 @@ function UserDetail({ id }) {
           </form>
         </Panel>
 
-        <Panel title="Order history">
+        <>{false && <Panel title="Order history">
           <ul className="divide-y divide-gold/15">
             {orders.map((o) => (
               <li key={o.orderCode} className="flex justify-between py-3 text-sm">
@@ -267,7 +267,7 @@ function UserDetail({ id }) {
             ))}
             {orders.length === 0 && <li className="py-3 text-sm text-ink-muted">No orders</li>}
           </ul>
-        </Panel>
+        </Panel>}</>
       </div>
 
       <div className="grid gap-6 lg:grid-cols-2">

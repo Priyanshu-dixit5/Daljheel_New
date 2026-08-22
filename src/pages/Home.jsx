@@ -56,10 +56,10 @@ export default function Home() {
       <StatsBar />
 
       {/* Shop by feeling – category grid */}
-      <ShopByFeeling categories={categories} />
+      <TrendyProducts products={products} />
 
       {/* Trendy products grid */}
-      <TrendyProducts products={products} />
+      <ShopByFeeling categories={categories} />
 
       {/* Brand story */}
       <BrandStory />

@@ -1,4 +1,4 @@
-import { Routes, Route } from 'react-router-dom';
+import { Navigate, Routes, Route } from 'react-router-dom';
 import Layout from './components/Layout';
 import ProtectedRoute from './components/ProtectedRoute';
 import AdminProtectedRoute from './components/AdminProtectedRoute';
@@ -23,9 +23,7 @@ import Addresses from './pages/account/Addresses';
 import AdminLayout from './pages/admin/AdminLayout';
 import AdminLogin from './pages/admin/AdminLogin';
 import AdminDashboard from './pages/admin/AdminDashboard';
-import AdminOrders from './pages/admin/AdminOrders';
 import AdminUsers from './pages/admin/AdminUsers';
-import AdminShipping from './pages/admin/AdminShipping';
 import AdminAnalytics from './pages/admin/AdminAnalytics';
 import AdminSettings from './pages/admin/AdminSettings';
 
@@ -42,13 +40,12 @@ export default function App() {
         }
       >
         <Route index element={<AdminDashboard />} />
-        <Route path="orders" element={<AdminOrders />} />
-        <Route path="orders/:orderCode" element={<AdminOrders />} />
         <Route path="users" element={<AdminUsers />} />
         <Route path="users/:id" element={<AdminUsers />} />
-        <Route path="shipping" element={<AdminShipping />} />
         <Route path="analytics" element={<AdminAnalytics />} />
         <Route path="settings" element={<AdminSettings />} />
+        <Route path="orders/*" element={<Navigate to="/admin" replace />} />
+        <Route path="shipping/*" element={<Navigate to="/admin" replace />} />
       </Route>
 
       <Route path="/" element={<Layout />}>

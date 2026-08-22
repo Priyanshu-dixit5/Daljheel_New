@@ -1,11 +1,16 @@
 import { Outlet, Link, useLocation } from 'react-router-dom';
+import { useEffect } from 'react';
 import AnnouncementBar from './AnnouncementBar';
 import Header from './Header';
 import Footer from './Footer';
-import { Heart, Home, Search, ShoppingBag, Tags } from 'lucide-react';
+import { Heart, Home, ShoppingBag, Tags } from 'lucide-react';
 
 export default function Layout() {
   const { pathname } = useLocation();
+
+  useEffect(() => {
+    window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
+  }, [pathname]);
 
   function navClass(to) {
     const active = pathname === to || (to !== '/' && pathname.startsWith(to));
@@ -23,7 +28,7 @@ export default function Layout() {
       </main>
       <Footer />
       {/* Bottom navigation — mobile only */}
-      <nav className="fixed inset-x-0 bottom-0 z-50 grid grid-cols-5 border-t border-[#ded7cb] bg-[#fffcf6] px-2 py-1.5 shadow-[0_-4px_18px_rgba(36,81,63,0.08)] lg:hidden">
+      <nav className="fixed inset-x-0 bottom-0 z-50 grid grid-cols-4 border-t border-[#ded7cb] bg-[#fffcf6] px-2 py-1.5 shadow-[0_-4px_18px_rgba(36,81,63,0.08)] lg:hidden">
         <Link to="/" className={navClass('/')}>
           <Home className="h-5 w-5" />
           <span>Home</span>
@@ -31,10 +36,6 @@ export default function Layout() {
         <Link to="/shop" className={navClass('/shop')}>
           <Tags className="h-5 w-5" />
           <span>Categories</span>
-        </Link>
-        <Link to="/shop?search=" className={navClass('/shop?search=')}>
-          <Search className="h-5 w-5" />
-          <span>Search</span>
         </Link>
         <Link to="/account/wishlist" className={navClass('/account/wishlist')}>
           <Heart className="h-5 w-5" />

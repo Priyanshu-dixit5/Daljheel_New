@@ -1,9 +1,7 @@
 import { NavLink, Outlet, useNavigate } from 'react-router-dom';
 import {
   LayoutDashboard,
-  Package,
   Users,
-  Truck,
   Heart,
   Settings,
   LogOut,
@@ -16,9 +14,7 @@ import { useAuth } from '../../context/AuthContext';
 
 const links = [
   { to: '/admin', end: true, label: 'Dashboard', icon: LayoutDashboard },
-  { to: '/admin/orders', label: 'Orders', icon: Package },
   { to: '/admin/users', label: 'Users', icon: Users },
-  { to: '/admin/shipping', label: 'Shipping', icon: Truck },
   { to: '/admin/analytics', label: 'Wishlist & Cart', icon: Heart },
   { to: '/admin/settings', label: 'Settings', icon: Settings },
 ];

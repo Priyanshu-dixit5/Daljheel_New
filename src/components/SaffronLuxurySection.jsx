@@ -34,7 +34,7 @@ export default function SaffronLuxurySection() {
   return (
     <section className="bg-purple-deep py-10 lg:py-24">
       <div className="page-wrap">
-        <div className="mb-5 overflow-hidden rounded-lg gold-border">
+        <div className="hidden">
           <img
             src="/saffron-luxury.png"
             alt="Daljheel Saffron — Pure Elegance. Rich in Every Thread."

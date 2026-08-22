@@ -57,6 +57,20 @@
     animation: trusted-scroll 40s linear infinite;
   }
 
+  .category-marquee {
+    width: max-content;
+    animation: category-scroll 28s linear infinite;
+  }
+
+  .category-marquee-track {
+    display: flex;
+    gap: 0.75rem;
+  }
+
+  .category-marquee:hover {
+    animation-play-state: paused;
+  }
+
   /* Horizontal scroll rail — hides scrollbar but keeps scroll */
   .scroll-rail {
     @apply flex gap-3 overflow-x-auto pb-2;
@@ -74,5 +88,14 @@
     to {
       transform: translateX(-33.333%);
     }
+  }
+
+  @keyframes category-scroll {
+    from { transform: translateX(0); }
+    to { transform: translateX(-50%); }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .category-marquee { animation: none; }
   }
 }
