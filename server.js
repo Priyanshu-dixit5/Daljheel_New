@@ -238,6 +238,40 @@ function formatAddress(addr) {
   return [addr.line1, addr.line2, addr.city, addr.state, addr.pincode].filter(Boolean).join(', ');
 }
 
+function formatMoney(amount) {
+  return `₹${Number(amount || 0).toLocaleString('en-IN')}`;
+}
+
+function whatsappOrderMessage(order) {
+  const itemLines = order.items.map((item) => {
+    const size = item.size ? ` (${item.size})` : '';
+    return `• ${item.name}${size}\n  Qty: ${item.qty} × ${formatMoney(item.price)} = ${formatMoney(item.lineTotal)}`;
+  });
+  const shipping = order.shipping === 0 ? 'Free' : formatMoney(order.shipping);
+  const note = order.customer.note ? `\nNote: ${order.customer.note}` : '';
+
+  return [
+    'Hello, I would like to confirm this order.',
+    '',
+    `Order number: ${order.orderCode}`,
+    '',
+    'Order items:',
+    ...itemLines,
+    '',
+    `Subtotal: ${formatMoney(order.subtotal)}`,
+    order.discount > 0 ? `Discount: -${formatMoney(order.discount)}` : null,
+    `Delivery: ${shipping}`,
+    `Total: ${formatMoney(order.total)}`,
+    '',
+    'Delivery details:',
+    `Name: ${order.customer.name}`,
+    `Phone: ${order.customer.phone}`,
+    `Address: ${order.customer.address}${note}`,
+  ]
+    .filter(Boolean)
+    .join('\n');
+}
+
 function issue(user) {
   const token = randomUUID();
   sessions.set(token, user);
@@ -307,12 +341,6 @@ async function createOrder(req, res, user) {
   const subtotal = lines.reduce((n, x) => n + x.product.price * x.qty, 0);
   const mrpTotal = lines.reduce((n, x) => n + x.product.mrp * x.qty, 0);
   const shipping = subtotal >= db.settings.freeShippingThreshold ? 0 : db.settings.flatShipping;
-  const paymentLabels = {
-    whatsapp: 'Confirm on WhatsApp',
-    cod: 'Cash on delivery',
-    upi: 'UPI',
-  };
-
   const order = {
     id: randomUUID(),
     orderCode: nextOrderCode(),
@@ -327,8 +355,8 @@ async function createOrder(req, res, user) {
     discount: mrpTotal - subtotal,
     shipping,
     total: subtotal + shipping,
-    paymentMethod: b.paymentMethod || 'whatsapp',
-    paymentLabel: paymentLabels[b.paymentMethod] || paymentLabels.whatsapp,
+    paymentMethod: 'whatsapp',
+    paymentLabel: 'Confirm on WhatsApp',
     status: 'Pending',
     adminNote: '',
     shippingInfo: {
@@ -344,9 +372,7 @@ async function createOrder(req, res, user) {
   if (user) db.carts[user.id] = [];
   save();
 
-  const text = encodeURIComponent(
-    `Hello, I want to confirm order ${order.orderCode} for ₹${order.total}.`
-  );
+  const text = encodeURIComponent(whatsappOrderMessage(order));
   return respond(res, 201, {
     order,
     whatsappUrl: `https://wa.me/${db.settings.whatsappDigits}?text=${text}`,

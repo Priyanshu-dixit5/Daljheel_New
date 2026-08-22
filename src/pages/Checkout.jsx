@@ -4,19 +4,6 @@ import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
 import { createOrder, fetchAddresses } from '../api';
 
-const PAYMENT_OPTIONS = [
-  {
-    id: 'whatsapp',
-    title: 'Confirm on WhatsApp',
-    desc: 'We open WhatsApp with your order for confirmation. No online payment.',
-  },
-  {
-    id: 'cod',
-    title: 'Cash on delivery',
-    desc: 'Pay when your order arrives. Confirmed via WhatsApp.',
-  },
-];
-
 export default function Checkout() {
   const { items, clearCart, totals } = useCart();
   const { user, isAuthenticated } = useAuth();
@@ -24,7 +11,6 @@ export default function Checkout() {
   const [addresses, setAddresses] = useState([]);
   const [addressId, setAddressId] = useState('');
   const [useSaved, setUseSaved] = useState(false);
-  const [paymentMethod, setPaymentMethod] = useState('whatsapp');
   const [form, setForm] = useState({
     name: user?.name || '',
     phone: user?.phone || '',
@@ -76,7 +62,6 @@ export default function Checkout() {
     try {
       const payload = {
         items: items.map((item) => ({ slug: item.slug, qty: item.qty })),
-        paymentMethod,
         customer: useSaved && addressId
           ? { note: form.note }
           : form,
@@ -100,8 +85,7 @@ export default function Checkout() {
         <p className="section-label mb-3">Checkout</p>
         <h1 className="section-heading mb-2">Complete your order</h1>
         <p className="mb-8 max-w-xl text-sm text-ink-muted">
-          Review your details and payment preference. Orders are confirmed on WhatsApp — no card
-          payment on this site.
+          Review your delivery details, then confirm your order on WhatsApp.
         </p>
 
         <form onSubmit={onSubmit} className="grid gap-8 lg:grid-cols-[1fr_340px]">
@@ -202,38 +186,6 @@ export default function Checkout() {
               </label>
             </div>
 
-            <div className="border border-gold/25 bg-white p-6">
-              <h2 className="font-display text-xl text-ink">Payment method</h2>
-              <p className="mt-1 text-xs text-ink-muted">
-                Structure for your preference — fulfilment is confirmed on WhatsApp.
-              </p>
-              <div className="mt-4 space-y-3">
-                {PAYMENT_OPTIONS.map((opt) => (
-                  <label
-                    key={opt.id}
-                    className={`block cursor-pointer rounded-sm border p-4 transition ${
-                      paymentMethod === opt.id
-                        ? 'border-gold bg-cream/70'
-                        : 'border-gold/20 hover:border-gold/40'
-                    }`}
-                  >
-                    <div className="flex items-start gap-3">
-                      <input
-                        type="radio"
-                        name="payment"
-                        checked={paymentMethod === opt.id}
-                        onChange={() => setPaymentMethod(opt.id)}
-                        className="mt-1"
-                      />
-                      <div>
-                        <p className="font-medium text-ink">{opt.title}</p>
-                        <p className="mt-0.5 text-sm text-ink-muted">{opt.desc}</p>
-                      </div>
-                    </div>
-                  </label>
-                ))}
-              </div>
-            </div>
           </div>
 
           <aside className="h-fit border border-gold/25 bg-white p-6">
@@ -272,7 +224,7 @@ export default function Checkout() {
             {error && <p className="mt-4 text-sm text-error">{error}</p>}
 
             <button type="submit" disabled={submitting} className="btn-primary mt-6 w-full">
-              {submitting ? 'Placing order…' : 'Place order'}
+              {submitting ? 'Opening WhatsApp…' : 'Confirm on WhatsApp'}
             </button>
             {!isAuthenticated && (
               <p className="mt-3 text-center text-xs text-ink-muted">
